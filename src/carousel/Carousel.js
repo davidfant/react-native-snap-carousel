@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, Easing, FlatList, I18nManager, Platform, ScrollView, View, ViewPropTypes, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { Animated, Easing, FlatList, I18nManager, Platform, ScrollView, View, ViewPropTypes, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 
@@ -1194,7 +1194,6 @@ export default class Carousel extends Component {
     }
 
     render () {
-        console.warn('render');
         const { data, renderItem } = this.props;
 
         if (!data || !renderItem) {
