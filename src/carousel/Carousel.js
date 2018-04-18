@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, Easing, FlatList, I18nManager, Platform, ScrollView, View, ViewPropTypes } from 'react-native';
+import { Animated, Easing, FlatList, I18nManager, Platform, ScrollView, View, ViewPropTypes, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 
@@ -38,6 +38,7 @@ export default class Carousel extends Component {
         customAnimationOptions: PropTypes.object,
         enableMomentum: PropTypes.bool,
         enableSnap: PropTypes.bool,
+        enableSnapOnInactivePress: PropTypes.bool,
         firstItem: PropTypes.number,
         hasParallaxImages: PropTypes.bool,
         inactiveSlideOpacity: PropTypes.number,
@@ -88,7 +89,7 @@ export default class Carousel extends Component {
 
         this.state = {
             hideCarousel: true,
-            interpolators: []
+            interpolators: [],
         };
 
         // The following values are not stored in the state because 'setState()' is asynchronous
@@ -929,6 +930,10 @@ export default class Carousel extends Component {
 
         this._canFireCallback = false;
         onSnapToItem && onSnapToItem(index);
+        // run in next run loop since this is heavy...
+        if (this.props.enableSnapOnInactivePress) {
+            setTimeout(() => this.forceUpdate());
+        }
     }
 
     startAutoplay () {
@@ -1172,14 +1177,24 @@ export default class Carousel extends Component {
             key: `scrollview-item-${index}`
         } : {};
 
+        // console.warn('wawa ', index, this._activeItem);
+        const isActive = (index === this._activeItem);
         return (
-            <Component style={[slideStyle, animatedStyle]} pointerEvents={'box-none'} {...specificProps}>
-                { renderItem({ item, index }, parallaxProps) }
-            </Component>
+            <TouchableOpacity
+                onPress={() => this.props.enableSnapOnInactivePress && this.snapToItem(index)}
+                activeOpacity={1/* bug with TouchableWithoutFeedback: doesn't work */} 
+                {...specificProps} >
+                <Component 
+                    pointerEvents={isActive ? 'auto' : 'none'}
+                    style={[slideStyle, animatedStyle]} >
+                    { renderItem({ item, index }, parallaxProps) }
+                </Component>
+            </TouchableOpacity>
         );
     }
 
     render () {
+        console.warn('render');
         const { data, renderItem } = this.props;
 
         if (!data || !renderItem) {
