@@ -862,7 +862,7 @@ export default class Carousel extends Component {
     }
 
     _snapToItem (index, animated = true, fireCallback = true, initial = false, lockScroll = true) {
-        const { enableMomentum, onSnapToItem } = this.props;
+        const { enableMomentum, enableSnapOnInactivePress, onSnapToItem } = this.props;
         const itemsLength = this._getCustomDataLength();
 
         if (!itemsLength || !this._scrollComponent || (!this._needsScrollView() && !this._scrollComponent._listRef)) {
@@ -884,6 +884,10 @@ export default class Carousel extends Component {
             }
 
             if (onSnapToItem && fireCallback) {
+                this._canFireCallback = true;
+            }
+
+            if (enableSnapOnInactivePress && fireCallback) {
                 this._canFireCallback = true;
             }
         }
